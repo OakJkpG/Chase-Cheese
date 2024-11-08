@@ -56,7 +56,7 @@ public class Display extends JFrame implements ActionListener {
         switch (command) {
             case "Start", "Restart" -> {
                 playSound("resources/sound/run.wav", true);
-                switchToPanel(new Game()); // Reinitialize Game instance
+                switchToPanel(new Game());
             }
             case "Main Menu" -> {
                 playSound("resources/sound/main.wav", true);
@@ -88,7 +88,7 @@ public class Display extends JFrame implements ActionListener {
         }
     }
 
-    // Nested StartGame panel class
+    // StartGame panel class
     static class StartGame extends JPanel {
         private final BufferedImage imgBg = Resource.getImage("resources/img/main.jpg");
 
@@ -119,7 +119,7 @@ public class Display extends JFrame implements ActionListener {
         }
     }
 
-    // Nested EndGame panel class
+    // EndGame panel class
     static class EndGame extends JPanel {
         private final BufferedImage imgBg = Resource.getImage("resources/img/main.jpg");
 

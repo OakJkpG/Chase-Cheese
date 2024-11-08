@@ -7,7 +7,7 @@ import java.io.File;
 
 public class Player implements Runnable {
     public int x, y, health = 500;
-    private static final int JUMP_HEIGHT = 250, JUMP_STEPS = 240;
+    private static final int JUMP_HEIGHT = 250, JUMP_STEPS = 250;
     private boolean isJumping = false;
     private JPanel page;
 

@@ -10,7 +10,7 @@ public class Environment implements Runnable {
     private boolean running = true;
     private JPanel page;
 
-    public static final int CLOUD = 0, BUILDING = 1;
+    public static final int CLOUD = 0, BUILDING = 1, NIGHT = 2;
 
     public Environment(int x, int y, JPanel page, int eType, int speed) {
         this.x = x;
@@ -37,7 +37,7 @@ public class Environment implements Runnable {
     public void stop() { running = false; }
 
     public BufferedImage getImage() {
-        String[] imageNames = {"cloud.png", "town.jpg"};
+        String[] imageNames = {"cloud.png", "town.jpg", "night.jpg"};
         try { return ImageIO.read(new File("resources/img/" + imageNames[eType])); }
         catch (Exception e) { e.printStackTrace(); }
         return null;

@@ -8,9 +8,11 @@ import javax.swing.JPanel;
 public class Wave implements Runnable {
     public int speed, x, y, x2, y2;
     private JPanel page;
-    private boolean running = true;
-    private static final int MIN_DISTANCE = 10;
     private Thread waveThread;
+    private boolean plus = false;
+    private boolean minus = false;
+    private long startTime;
+    private long checkTime = 10;
 
     public Wave(int x, int y, int speed, JPanel page) {
         this.x = x;
@@ -19,33 +21,31 @@ public class Wave implements Runnable {
         this.y2 = y;
         this.speed = speed;
         this.page = page;
-        start(); // Start the movement thread
+        start();
     }
 
     public void start() {
         if (waveThread == null || !waveThread.isAlive()) {
             waveThread = new Thread(this);
             waveThread.start();
+            startTime = System.currentTimeMillis();
         }
     }
-
-    public void stop() {
-        running = false;
-    }
+    
 
     @Override
     public void run() {
-        while (running) {
+        while (true) {
+            if((System.currentTimeMillis() - startTime) / 1000==checkTime){
+                speed++;
+                checkTime+=10;
+            }
             move();
             try { Thread.sleep(30); } catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
     
-    private int temp_x = 0;
-    
-    
     private void move() {
-        // Reset wave positions when they move off-screen
         if (x <= -50) {
             x = 3000 + (int)Math.random()*1000;
         }
@@ -64,9 +64,7 @@ public class Wave implements Runnable {
 
         page.repaint();
     }
-
-
-
+    
     public BufferedImage getImage() {
         return loadImage("resources/img/cat.png");
     }

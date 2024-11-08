@@ -1,5 +1,8 @@
 package Game;
 
+import Element.*;
+import Character.*;
+import Event.Event;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,46 +10,82 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import Character.*;
-import Element.Element;
-import javax.sound.sampled.*;
 
 public class Game extends JPanel implements KeyListener {
 
     private static final long serialVersionUID = 1L;
     private int speed = 10;
-    private static int pSize = 100, waveHeight = 80,base = 500, xStart = 1200;
-    private long point = 0, lastPress = 0;
-    private long startTime; // To track the game start time
-    private Timer gameTimer; // Timer for updating the score duration
+    static int pSize = 100, waveHeight = 80, base = 500, xStart = 1200;
+    public long point = 0;
+    private long lastPress = 0;
+    private long startTime;
+    private Timer gameTimer;
 
     private Player p1 = new Player(100, base - 80);
     static Display display;
 
-    private Wave[] waveSet = makeWave(4);
+    private Wave[] waveSet;
+    private Environment[] envSet;
+    private Environment building;
+    private Environment building2;
 
-    private Environment[] envSet = makeEnv(2, Environment.CLOUD);
-    private Environment building = new Environment(xStart - 1200, base - 150, this, Environment.BUILDING, 4);
-    private Environment building2 = new Environment(xStart + 780, base - 150, this, Environment.BUILDING, 4);
-
-    private static Clip hitClip;
-    private static Clip getClip;
-    private static Clip jumpClip;
-    private static Clip gameOverClip;
+    private Sound sound = new Sound();
+    private Event eventHandler;
+    
+    private long lastMessageTime = 10;
+    private boolean act = false;
 
     public Game() {
         this.setBounds(getWidth(), getHeight(), 1280, 720);
         this.addKeyListener(this);
         this.setLayout(null);
         this.setFocusable(true);
-        loadSounds();
+        eventHandler = new Event(this);
+        waveSet = eventHandler.makeWave(4);
+        envSet = makeEnv(6, Environment.CLOUD);
+        building = new Environment(xStart - 1200, base - 150, this, Environment.BUILDING, 4);
+        building2 = new Environment(xStart + 780, base - 150, this, Environment.NIGHT, 4);
         startTimer();
     }
 
     private void startTimer() {
-        startTime = System.currentTimeMillis(); // Record the start time
-        gameTimer = new Timer(1000, e -> repaint()); // Update every second
-        gameTimer.start(); // Start the timer
+        startTime = System.currentTimeMillis();
+        gameTimer = new Timer(1000, e -> {
+            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+            if (elapsedTime >= lastMessageTime) {
+                
+                act = true;
+            }
+            repaint();
+        });
+        gameTimer.start();
+    }
+    public int getSpeed() {
+        return speed;
+    }
+
+    public int getBase() {
+        return base;
+    }
+
+    public int getPSize() {
+        return pSize;
+    }
+
+    public int getWaveHeight() {
+        return waveHeight;
+    }
+
+    public Player getPlayer() {
+        return p1;
+    }
+
+    public long getPoint() {
+        return point;
+    }
+
+    public Sound getSound() {
+        return sound;
     }
 
     @Override
@@ -60,8 +99,8 @@ public class Game extends JPanel implements KeyListener {
             g2.setColor(Color.white);
             g2.drawString("Point : " + point, 1100, 40);
             //---TIMER----
-            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000; // Calculate elapsed time in seconds
-            g2.drawString("Time : " + elapsedTime + "s", 1100, 70); // Display elapsed time
+            long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
+            g2.drawString("Time : " + elapsedTime + "s", 1100, 70);
             //--- mouse --
             g2.setColor(Color.RED);
             drawHealthBar(g2);
@@ -71,7 +110,16 @@ public class Game extends JPanel implements KeyListener {
             g2.drawString(p1.health / 5 + "%", 520, 40);
             //----Wave----
             for (Wave item : waveSet) {
-                drawWave(item, g2);
+                eventHandler.drawWave(item, g2);
+            }
+            //----Message----
+            if (act) {
+                g2.setColor(Color.YELLOW);
+                g2.drawString("The game speed has changed!", 400, 200);
+                if(elapsedTime - lastMessageTime == 3){
+                    act = false;
+                    lastMessageTime += 10;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,46 +149,6 @@ public class Game extends JPanel implements KeyListener {
         }
     }
 
-    private Wave[] makeWave(int size) {
-        Wave[] waveSet = new Wave[size];
-        int x = 2000; // Starting position for the first wave
-
-        for (int i = 0; i < size; i++) {
-            waveSet[i] = new Wave(x, base, speed, this);
-            x += 500;
-        }
-        return waveSet;
-    }
-
-    private boolean check(Player p1, int pSize, int waveX, int waveY, int waveHeight) {
-        return p1.x + pSize > waveX && p1.x < waveX && p1.y + pSize >= waveY - waveHeight;
-    }
-
-    private void drawWave(Wave wave, Graphics2D g2) {
-        g2.drawImage(wave.getImage(), wave.x, (wave.y - waveHeight), 100, waveHeight + 10, null);
-        g2.drawImage(wave.getImage2(), wave.x2, (wave.y2 - waveHeight), 100, waveHeight + 10, null);
-        
-        if (check(p1, pSize, wave.x, wave.y, waveHeight)) {
-            g2.drawImage(p1.getImage2(), p1.x, p1.y, pSize, pSize, null);
-            playHitSound(); // Play collision sound
-            if (p1.health >= 60) {
-                p1.health -= 10;
-            } else {
-                restartGame();
-            }
-        }
-
-        if (check(p1, pSize, wave.x2, wave.y2, waveHeight)) {
-            playGetSound(); // Play getting sound
-            wave.x2 = -100;
-            this.point += 1;
-            if (p1.health < 300) {
-                p1.health += 10;
-            }
-        }
-      
-    }
-
     private Environment[] makeEnv(int size, int eType) {
         Environment[] envSet = new Environment[size];
         int far = 0;
@@ -155,22 +163,21 @@ public class Game extends JPanel implements KeyListener {
         long elapsedTime = (System.currentTimeMillis() - startTime) / 1000;
         display.endGame(point, elapsedTime);
         removeKeyListener(this); 
-        resetGameElements();  // Calls methods to reset player, waves, environment, etc.
-        startTime = System.currentTimeMillis();  // Reset start time for the timer
-        gameTimer.restart();  // Restart timer instead of creating a new one
+        resetGameElements();
+        startTime = System.currentTimeMillis();
+        gameTimer.restart();
         point = 0;
         lastPress = 0;
-
         display.stopSound();
-        playGameOverSound();
+        sound.playGameOverSound();
         addKeyListener(this);  
         repaint();
     }
     
     private void resetGameElements() {
-        p1 = new Player(100, base - 80);  
-        waveSet = makeWave(4);  
-        envSet = makeEnv(2, Environment.CLOUD);  
+        p1 = new Player(100, base - 80);
+        waveSet = eventHandler.makeWave(4);
+        envSet = makeEnv(2, Environment.CLOUD);
     }
 
     @Override
@@ -183,7 +190,7 @@ public class Game extends JPanel implements KeyListener {
             if (e.getKeyCode() == 32 || e.getKeyCode() == 38) {
                 p1.jump(this);
                 lastPress = System.currentTimeMillis();
-                playJumpSound();
+                sound.playJumpSound();
             }
         }
     }
@@ -195,55 +202,4 @@ public class Game extends JPanel implements KeyListener {
     public static void main(String[] arg) {
         display = new Display();
     }
-
-    private void loadSounds() {
-        try {
-            hitClip = AudioSystem.getClip();
-            hitClip.open(AudioSystem.getAudioInputStream(new File("resources/sound/hit.wav")));
-            
-            getClip = AudioSystem.getClip();
-            getClip.open(AudioSystem.getAudioInputStream(new File("resources/sound/get.wav")));
-
-            jumpClip = AudioSystem.getClip();
-            jumpClip.open(AudioSystem.getAudioInputStream(new File("resources/sound/jump.wav")));
-
-            gameOverClip = AudioSystem.getClip();
-            gameOverClip.open(AudioSystem.getAudioInputStream(new File("resources/sound/gameover.wav")));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void playHitSound() {
-        if (hitClip.isRunning()) {
-            hitClip.stop(); // Stop the current sound if it's still playing
-        }
-        hitClip.setFramePosition(0); // Rewind to the beginning
-        hitClip.start(); // Play the sound
-    }
-    
-    public void playGetSound() {
-        if (getClip.isRunning()) {
-            getClip.stop(); // Stop the current sound if it's still playing
-        }
-        getClip.setFramePosition(0); // Rewind to the beginning
-        getClip.start(); // Play the sound
-    }
-    
-    public void playJumpSound() {
-        if (jumpClip.isRunning()) {
-            jumpClip.stop(); // Stop the current sound if it's still playing
-        }
-        jumpClip.setFramePosition(0); // Rewind to the beginning
-        jumpClip.start(); // Play the sound
-    }
-
-    public void playGameOverSound() {
-        if (gameOverClip.isRunning()) {
-            gameOverClip.stop(); // Stop the current sound if it's still playing
-        }
-        gameOverClip.setFramePosition(0); // Rewind to the beginning
-        gameOverClip.start(); // Play the sound
-    }
-
 }
