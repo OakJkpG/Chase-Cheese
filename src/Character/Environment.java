@@ -34,8 +34,6 @@ public class Environment implements Runnable {
         x = (x < -2000) ? 1970 : x - 2;
     }
 
-    public void stop() { running = false; }
-
     public BufferedImage getImage() {
         String[] imageNames = {"cloud.png", "town.jpg", "night.jpg"};
         try { return ImageIO.read(new File("resources/img/" + imageNames[eType])); }

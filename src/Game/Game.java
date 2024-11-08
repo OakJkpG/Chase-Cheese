@@ -20,17 +20,18 @@ public class Game extends JPanel implements KeyListener {
     private long lastPress = 0;
     private long startTime;
     private Timer gameTimer;
-
-    private Player p1 = new Player(100, base - 80);
     static Display display;
 
-    private Wave[] waveSet;
-    private Environment[] envSet;
-    private Environment building;
-    private Environment building2;
+    private Player p1 = new Player(100, base - 80);
 
-    private Sound sound = new Sound();
-    private Event eventHandler;
+    private Wave[] waveSet;
+    
+    private Environment[] envSet;
+    private final Environment building;
+    private final Environment building2;
+
+    private final Sound sound = new Sound();
+    private final Event eventHandler;
     
     private long lastMessageTime = 10;
     private boolean act = false;
