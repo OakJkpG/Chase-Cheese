@@ -7,7 +7,6 @@ import java.io.File;
 
 public class Environment implements Runnable {
     public int x, y, speed, eType;
-    private boolean running = true;
     private JPanel page;
 
     public static final int CLOUD = 0, BUILDING = 1, NIGHT = 2;
@@ -23,7 +22,7 @@ public class Environment implements Runnable {
 
     @Override
     public void run() {
-        while (running) {
+        while (true) {
             move();
             page.repaint();
             try { Thread.sleep(16); } catch (InterruptedException e) { e.printStackTrace(); }
@@ -31,7 +30,7 @@ public class Environment implements Runnable {
     }
 
     private void move() {
-        x = (x < -2000) ? 1970 : x - 2;
+        x = (x < -2000) ? 1970 : x - speed;
     }
 
     public BufferedImage getImage() {

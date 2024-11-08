@@ -30,7 +30,6 @@ public class Event {
     public void drawWave(Wave wave, Graphics2D g2) {
         g2.drawImage(wave.getImage(), wave.x, (wave.y - game.getWaveHeight()), 100, game.getWaveHeight() + 10, null);
         g2.drawImage(wave.getImage2(), wave.x2, (wave.y2 - game.getWaveHeight()), 100, game.getWaveHeight() + 10, null);
-
         if (check(game.getPlayer(), game.getPSize(), wave.x, wave.y, game.getWaveHeight())) {
             g2.drawImage(game.getPlayer().getImage2(), game.getPlayer().x, game.getPlayer().y, game.getPSize(), game.getPSize(), null);
             game.getSound().playHitSound();

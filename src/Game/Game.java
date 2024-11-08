@@ -43,8 +43,8 @@ public class Game extends JPanel implements KeyListener {
         eventHandler = new Event(this);
         waveSet = eventHandler.makeWave(4);
         envSet = makeEnv(6, Environment.CLOUD);
-        building = new Environment(xStart - 1200, base - 150, this, Environment.BUILDING, 4);
-        building2 = new Environment(xStart + 780, base - 150, this, Environment.NIGHT, 4);
+        building = new Environment(xStart - 1200, base - 150, this, Environment.BUILDING, 2);
+        building2 = new Environment(xStart + 780, base - 150, this, Environment.NIGHT, 2);
         startTimer();
     }
 
@@ -153,7 +153,7 @@ public class Game extends JPanel implements KeyListener {
         Environment[] envSet = new Environment[size];
         int far = 0;
         for (int i = 0; i < size; i++) {
-            envSet[i] = new Environment(xStart + far, 20, this, eType, 10);
+            envSet[i] = new Environment(xStart + far, 20, this, eType, 2);
             far += 600;
         }
         return envSet;
@@ -186,7 +186,7 @@ public class Game extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (System.currentTimeMillis() - lastPress > 0) {
+        if (System.currentTimeMillis() - lastPress > 100) {
             if (e.getKeyCode() == 32 || e.getKeyCode() == 38) {
                 p1.jump(this);
                 lastPress = System.currentTimeMillis();

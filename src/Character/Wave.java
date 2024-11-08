@@ -9,8 +9,6 @@ public class Wave implements Runnable {
     public int speed, x, y, x2, y2;
     private JPanel page;
     private Thread waveThread;
-    private boolean plus = false;
-    private boolean minus = false;
     private long startTime;
     private long checkTime = 10;
 
