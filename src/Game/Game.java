@@ -13,7 +13,6 @@ import javax.swing.*;
 
 public class Game extends JPanel implements KeyListener {
 
-    private static final long serialVersionUID = 1L;
     private int speed = 10;
     static int pSize = 100, waveHeight = 80, base = 500, xStart = 1200;
     public long point = 0;

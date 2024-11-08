@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Display extends JFrame implements ActionListener {
-    private static final long serialVersionUID = 1L;
     private static Clip clip;
 
     public Display() {
