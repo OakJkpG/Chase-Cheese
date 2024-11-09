@@ -50,6 +50,7 @@ public class Wave implements Runnable {
 
         if (x2 <= -50) { 
             x2 = 2000 + (int)Math.random()*1000;
+            y2 = y;
         }
         
         if (Math.abs(x - x2) < 100){
